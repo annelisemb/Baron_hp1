@@ -1,0 +1,80 @@
+library(tidyverse)
+library(babynames)
+
+ABvector <- letters[1:10]
+
+write_rds(ABvector, "myvec.rds")
+
+# if want to save it in specific folder in project, write_rds(ABvector, "foldername/myvec.rds")
+
+
+# strings
+
+# to get He said "That's amazing!"
+amazing <- "He said \"That\'s amazing!\""
+str_view(amazing)
+
+str_c(c("Hi ", "Bye "), c("John", "Susan"))
+
+str_c("Hello ", c("John", "Susan"))
+
+df <- tibble(name = c("Flora", NA, "Terra"))
+df %>% mutate(greeting = str_c("Hi ", name, "!"))
+df %>%
+  mutate(
+    # if name is NA and you want to use "you" after hi
+    greeting1 = str_c("Hi ", coalesce(name, "you"), "!"),
+    # if name is NA and you just want Hi
+    greeting2 = coalesce(str_c("Hi ", name, "!"), "Hi!")
+  )
+
+df_middles <- babynames %>%
+  mutate(
+    name_length = str_length(name),
+    mid_num = name_length/2,
+    mid_num_up = ceiling(mid_num),
+    mid_letter = str_sub(name, mid_num_up, mid_num_up)
+  )
+df_middles
+
+
+starwars %>%
+  mutate(
+    row = row_number(),
+    hair_color = if_else(is.na(hair_color), "rainbow", hair_color),
+    eye_color = case_when(
+      eye_color = "yellow" ~ "YELLOW",
+      eye_color = "blue" ~ "BLUE",
+      hair_color = "rainbow" ~ "RAINBOW",
+      .default = eye_color
+    ),
+      .before = name)
+ )
+starwars
+
+
+
+install.packages("tidytuesdayR")
+tuesdata <- tidytuesdayR::tt_load('2022-04-19')
+tuesdata <- tidytuesdayR::tt_load(2022, week = 16)
+
+big_dave <- tuesdata$big_dave
+
+
+tuesdata <- tidytuesdayR::tt_load('2022-10-18')
+tuesdata <- tidytuesdayR::tt_load(2022, week = 42)
+
+episodes <- tuesdata$episodes
+
+
+tuesdata <- tidytuesdayR::tt_load('2020-01-14') 
+tuesdata <- tidytuesdayR::tt_load(2020, week = 3)
+
+
+passwords <- tuesdata$passwords
+
+seattle_pets <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-03-26/seattle_pets.csv")
+
+#| error: true
+
+

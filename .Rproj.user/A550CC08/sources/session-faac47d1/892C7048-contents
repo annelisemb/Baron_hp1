@@ -1,0 +1,68 @@
+library(tidyverse)
+library(babynames)
+
+fivenames <- babynames |> 
+  filter(name == c("Walter", "Saul", "Skylar", "Jessie", "Mike")) 
+
+fivenames2 <- babynames |> 
+  filter(name %in% c("Walter", "Saul", "Skylar", "Jessie", "Mike")) 
+
+babynames %>%
+  group_by(name, sex) %>% 
+  summarise(total = sum(n)) %>% 
+  arrange(desc(total))
+
+# class 1/31
+
+participant <- 1:5
+stimulus <- c("1a", "1b", "1c", "2a", "2b", "2c")
+# this function gives all the combinations 
+df_toy <- expand_grid(participant,stimulus)
+# add a distribution of reaction times with mean 300 as new column
+df_toy <- add_column(df_toy, 
+                     reaction_time = rnorm(30, mean = 300, sd = 20))
+
+head(df_toy, 10)
+
+df_toy <- df_toy %>% 
+  separate(stimulus, into = c("item", "pos"), sep = 1)
+df_toy
+
+df_toy %>%
+  group_by(pos) %>%
+  summarise(
+    mean = mean(reaction_time)
+  )
+
+mean(participants = 1:5)
+
+in quarto 
+the fastest was participant `r df_part_mean`
+
+
+tidy_survey %>%
+  filter(letter_id == "a" | letter_id == "b") %>% 
+  group_by(participant, letter_id, subject) %>%
+  summarize(mean_rating = mean(rating))  %>% 
+  pivot_wider(names_from=letter_id, values_from=mean_rating) %>%
+  ggplot(mapping=aes(x=a, y=b, fill=subject, color=subject)) + geom_point() + 
+  geom_smooth() +
+  facet_wrap(~subject)
+
+ggplot(
+  data = tidy_survey,
+  mapping = aes(x = participant, y = rating)
+) +
+  geom_point(mapping = aes(color = letter_id)) bad one
+
+# scatterplot: for each participant, their a rating vs their b rating
+#tidy_survey %>%
+#  ggplot() + geom_point(mapping=aes(x=a, y=b))
+
+
+
+
+#filter(letter_id == "a" | letter_id == "b") %>% 
+#  group_by(participant, letter_id) %>%
+#  summarize(mean_rating = mean(rating)) %>% 
+#  pivot_wider(names_from=letter_id, values_from=mean_rating) %>%

@@ -1,0 +1,173 @@
+---
+title: "Homework 1"
+author: "Annelise Baron"
+format: html
+editor_options: 
+  chunk_output_type: console
+---
+
+## 1 Import
+
+```{r}
+library(tidyverse)
+library(googlesheets4)
+df_survey <- read_sheet("https://docs.google.com/spreadsheets/d/1V4zxt-zlLwsQ7xbP-kkNh2pFyjTDDnKtS-IhpFJ03wc/edit#gid=196049496")
+```
+
+## 2 Rename
+
+```{r}
+df_survey <- df_survey %>%
+  rename(time = Timestamp,
+         email = `Email Address`,
+         native_english = `Did you grow up speaking English in the United States?`,
+         zip_code = `If you did grow up speaking English in the United States, what zip code would most accurately represent where you feel your language variety is "from"? If you did not, enter NA.`,
+         car_01b = `01b The car needs to be repaired.`,
+         car_01a = `01a The car needs repaired.`,
+         car_01c = `01c The car needs repairing.`,
+         baby_02a = `02a The baby just woke up and probably wants fed.`,
+         dog_03a = `03a This dog sure does like petted.`,
+         car_04a = `04a The car needs washed, not necessarily by you, but by someone before the weekend.`,
+         baby_07a = `07a The baby wants cuddled by her mother.`,
+         soul_08a = `08a The soul needs fed by creative, multi-dimensional teaching.`,
+         car_09a = `09a The car needn't washed.`,
+         car_10a = `10a The car doesn't need washed.`,
+         brain_06a = `06a Your brain needs fed to work out.`,
+         baby_02b = `02b The baby just woke up and probably wants to be fed.`,
+         dog_03b = `03b This dog sure does like to be petted.`,
+         car_04b = `04b The car needs to be washed, not necessarily by you, but by someone before the weekend.`,
+         baby_07b = `07b The baby wants to be cuddled by her mother.`,
+         soul_08b = `08b The soul needs to be fed by creative, multi-dimensional teaching.`,
+         car_09b = `09b The car needn't to be washed.`,
+         car_10b = `10b The car doesn't need to be washed.`,
+         brain_06b = `06b Your brain needs to be fed to work out.`
+         )
+
+#df_survey <- df_survey
+#janitor:: clean_names()
+```
+
+## 3 Anonymize
+
+```{r}
+df_survey <- df_survey %>%
+  mutate(email = 1:nrow(df_survey))
+df_survey <- df_survey %>%
+  rename(participant = email)
+df_survey
+```
+
+## 4 Pivot
+
+```{r}
+tidy_survey <- df_survey %>%
+  pivot_longer(
+    cols = !(time:participant:native_english:zip_code),
+    names_to = c("subject", "id"),
+    names_sep = "_",
+    values_to = "rating"
+  )
+```
+
+## 5 Conditions
+
+```{r}
+tidy_survey <- tidy_survey %>% 
+  separate(id, into = c("number_id", "letter_id"), sep = 2)
+tidy_survey
+
+tidy_survey <- tidy_survey %>%
+  mutate(condition = case_when(
+    letter_id == "a" ~ 'needs construction',
+    letter_id == "b" ~ 'needs to be',
+    letter_id == "c" ~ 'other'
+  ))
+```
+
+## 6 N Participants
+
+```{r}
+tidy_survey %>%
+  summarise(n_participants = n_distinct(participant))
+```
+
+## 7 Part Rating
+
+```{r}
+tidy_survey %>%
+  group_by(participant) %>%
+  summarize(mean(rating))
+```
+
+## 8 Part Rating Condition A
+
+```{r}
+tidy_survey %>%
+  filter(letter_id == "a") %>%
+  group_by(participant) %>%
+  summarise(mean = mean(rating))
+```
+
+## 9 Part Rating Conditions A and B
+```{r}
+df_survey_ab <- tidy_survey %>%
+  filter(letter_id == "a" | letter_id == "b") %>% 
+  group_by(participant, letter_id) %>%
+  summarise(mean(rating))
+```
+
+## 10 Pivot Wider and Compare
+
+```{r}
+df_survey_ab %>% 
+  pivot_wider(names_from = letter_id, values_from='mean(rating)') %>%
+  mutate(diff=b-a)
+```
+
+## 11 Item Rating
+
+```{r}
+df_survey_items <- tidy_survey %>%
+  group_by(subject, number_id, letter_id) %>% 
+  summarize(mean(rating))
+df_survey_items
+```
+
+## 12 Condition Rating
+```{r}
+tidy_survey %>%
+  filter(letter_id == "a" | letter_id == "b") %>%
+  group_by(letter_id) %>%
+  summarise(mean(rating))
+```
+
+## 13 Pivot Items Wider
+
+```{r}
+df_survey_items  %>%
+  filter(letter_id == "a" | letter_id == "b") %>%
+  pivot_wider(names_from = letter_id, values_from = 'mean(rating)')  %>%
+  mutate(diff = b - a)
+```
+
+## 14 Plot 
+
+```{r}
+tidy_survey %>%
+  ggplot() + 
+  geom_histogram(mapping = aes(x = rating, fill = letter_id))
+```
+
+```{r}
+tidy_survey %>%
+  ggplot() + 
+  geom_histogram(mapping = aes(x = rating, fill = subject))
+```
+
+## Export
+
+```{r}
+write_rds(df_survey, "homework1_files/df_survey.rds")
+```
+
+

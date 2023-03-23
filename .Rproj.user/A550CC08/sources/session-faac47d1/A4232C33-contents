@@ -1,0 +1,235 @@
+---
+title: "homework2"
+author: "Annelise Baron"
+format: html
+---
+
+## set up
+
+```{r}
+library(tidyverse)
+```
+
+## 1 export
+
+
+```{r}
+write_rds(df_survey, "data_frames/df_survey.rds")
+```
+
+```{r}
+write_rds(df_survey_ab, "data_frames/df_survey_ab.rds")
+```
+
+```{r}
+write_rds(df_survey_items, "data_frames/df_survey_items.rds")
+```
+
+```{r}
+write_rds(tidy_survey, "data_frames/tidy_survey.rds")
+```
+
+## 2 import
+
+```{r}
+read_rds("data_frames/df_survey.rds")
+```
+
+```{r}
+read_rds("data_frames/df_survey_ab.rds")
+```
+
+```{r}
+read_rds("data_frames/df_survey_items.rds")
+```
+
+```{r}
+read_rds("data_frames/tidy_survey.rds")
+```
+
+## 3 sentences dataframe
+
+```{r}
+df_sentences <- data.frame(
+  id = c("01b", "01a", "01c", "02a", "03a", "04a", "07a", "08a", "09a", "10a", "06a", "02b", "03b", "04b", "07b", "08b", "09b", "10b", "06b"),
+  sentence = c("The car needs to be repaired.",
+               "The car needs repaired.",
+               "The car needs repairing.",
+               "The baby just woke up and probably wants fed.",
+               "This dog sure does like petted.",
+               "The car needs washed, not necessarily by you, but by someone before the weekend.",
+               "The baby wants cuddled by her mother.",
+               "The soul needs fed by creative, multi-dimensional teaching.",
+               "The car needn't washed.",
+               "The car doesn't need washed.",
+               "Your brain needs fed to work out.",
+               "The baby just woke up and probably wants to be fed.",
+               "This dog sure does like to be petted.",
+               "The car needs to be washed, not necessarily by you, but by someone before the weekend.",
+               "The baby wants to be cuddled by her mother.",
+               "The soul needs to be fed by creative, multi-dimensional teaching.",
+               "The car needn't to be washed.",
+               "The car doesn't need to be washed.",
+               "Your brain needs to be fed to work out."
+               )
+)
+df_sentences
+```
+
+## 4 add sentences
+
+```{r}
+df_survey_items <- df_survey_items %>%
+  unite(id, number_id:letter_id, sep = "")
+```
+
+```{r}
+df_survey_items %>%
+  left_join(df_sentences)
+```
+
+## 5 participants dataframe
+
+```{r}
+df_participants <- data.frame(
+  participant = c(1:24),
+  email = c("rileymit@umich.edu",
+            "hicksmj@umich.edu",
+            "alexzvk@umich.edu",
+            "evmc@umich.edu",
+            "mashna@umich.edu",
+            "milaaron@umich.edu",
+            "alviny@umich.edu",
+            "mariafe@umich.edu",
+            "fkusumo@umich.edu",
+            "wuboyan@umich.edu",
+            "annemb@umich.edu",
+            "bdreyer@umich.edu",
+            "hayesan@umich.edu",
+            "cewade@umich.edu",
+            "ksteph@umich.edu",
+            "zhumeich@umich.edu",
+            "bryanli@umich.edu",
+            "wrighkat@umich.edu",
+            "soro@umich.edu",
+            "amjawors@umich.edu",
+            "bgarten@umich.edu",
+            "songyuch@umich.edu",
+            "zmakim@umich.edu",
+            "reshad@umich.edu"
+            )
+)
+df_participants
+```
+
+joined just to ensure the key works
+```{r}
+df_survey_ab %>%
+  left_join(df_participants)
+```
+
+## 6 correct zip codes
+
+```{r}
+#tidy_survey <- tidy_survey %>%
+#  separate_wider_position(zip_code, widths = c(zip_code = 5), too_few = "align_start", too_many = "drop")
+#tidy_survey
+
+#tidy_survey <- tidy_survey %>%
+#  str_sub(zip_code, 1, 5)
+
+tidy_survey <- tidy_survey %>%
+  mutate(
+    zip_code = if_else(str_length(zip_code) == 5, zip_code, "NA")
+    )
+```
+
+## 7 locate zip codes
+
+I cannot figure this out
+
+```{r}
+library(zipcodeR)
+```
+
+```{r}
+geocode_zip(48104)
+```
+
+```{r}
+#tidy_survey %>%
+  #group_by(zip_code) %>%
+  #mutate(
+    #lat_lon = if_else(str_length(zip_code) == 5 %>% geocode_zip(zip_code), zip_codew, "NA")
+    #)
+
+#tidy_survey %>%
+#  filter(str_length(zip_code) == 5) %>%
+#  lat_lon = geocode_zip(zip_code)
+
+tidy_survey <- tidy_survey %>%
+  mutate(
+    lat_lon =
+      if_else(zip_code = 48180, geocode_zip(48180), "NA")
+tidy_survey
+     
+      geocode_zip(48027),
+      geocode_zip(48025),
+      geocode_zip(48167),
+      geocode_zip(48176),
+      geocode_zip(48104),
+      geocode_zip(48306),
+      geocode_zip(30024),
+      geocode_zip(48126),
+      geocode_zip(49508),
+      geocode_zip(48103),
+      geocode_zip(48895),
+      geocode_zip(48038),
+      geocode_zip(48059),
+      geocode_zip(48108)
+  )
+```
+
+## 8 map participants
+
+I think this would be the right code if I was successful with #7
+
+```{r}
+tidy_survey %>%
+  group_by(lat_lon)
+  ggplot(aes(x = lon, y = lat)) +
+    borders("state") +
+    geom_point() +
+    coord_quickmap()
+```
+
+## 9 color scale
+
+I know this is wrong but I really don't know how to go about this
+
+```{r}
+tidy_survey %>%
+  group_by(lat_lon)
+  ggplot(aes(x = lon, y = lat, color = 
+               filter(letter_id == "a" %>%
+                        summarise(mean(rating))))) +
+    borders("state") +
+    geom_point() +
+    coord_quickmap()
+```
+
+## 10 process payments
+
+can't figure out, ran out of time to attempt the rest
+
+```{r}
+tidy_survey %>%
+  filter(letter_id == "a") %>%
+  group_by(letter_id) %>%
+  summarise(mean(rating)) %>%
+  mutate(
+    mean_rate = if_else(rating > mean(rating), rating, "NA"
+    )
+  )
+```
+

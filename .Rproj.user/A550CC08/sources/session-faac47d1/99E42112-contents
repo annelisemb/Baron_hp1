@@ -1,0 +1,18 @@
+library(tidyverse)
+library(bakeoff)
+library(zipcodeR)
+
+data(package = "bakeoff")
+
+glimpse(bakers)
+
+episodes
+episodes_raw
+ratings
+ratings_raw
+
+ratings %>%
+  ggplot(
+    aes(x = viewers_28day - viewers_7day)
+  ) +
+  geom_density()

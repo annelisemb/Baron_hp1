@@ -1,0 +1,207 @@
+2 + 3
+Marc <- 32; Marc
+# use less than and dash to assign a value to something
+Lorelei <- 30
+Steve <- 27
+
+#install.packages("tidyverse")
+#install.packages("babynames")
+
+library(tidyverse)
+library(babynames)
+
+data(babynames)
+head(babynames)
+# shows preview of first 6 lines of data set
+tail(babynames)
+# shows preview of last 6 lines of data set
+
+filter(babynames, name == "Annelise")
+
+ggplot(data = filter(babynames, name == "Annelise" & sex == "F"), mapping = aes(x = year,y = n))+
+  geom_line()
+# can see in plots panel
+
+view(babynames)
+# to see spreadsheet of data
+
+df_Annelise <- filter(babynames, name == "Annelise")
+# to save to an object, df stands for data frame (helpful to know what object contains)
+
+df_Annelise <- filter(babynames, name == "Annelise" & sex == "F")
+# this will override the first df_Annelise object. & represents that A and B is true
+
+ggplot(data = df_Annelise, mapping = aes(x = year, y = n))+
+  geom_line()
+# now that we have df_Annelise, we can use it to make a plot in an easier manner than the first ggplot code line
+
+df_Annelise_piped <- babynames %>%
+  filter(., name == "Annelise" & sex == "F")
+
+df_Annelise_basepiped <- babynames |>
+  filter(name == "Annelise" & sex == "F")
+
+babynames %>% 
+  group_by(name, sex) %>% 
+  count() %>% 
+  group_by(name) %>% 
+  count() %>% 
+  filter(n == 2)
+# gives us all names that occurred for both M and F in at least one year. using pipe
+
+?filter
+help(filter)
+?babynames
+help(package = "babynames")
+# all will given you info in the help panel
+
+
+# How many rows are there for a specific name of your choice before or after a certain year?
+babynames %>%
+  filter(name == "Marie" & year > 1999) %>%
+  summarise(n = n())
+# For beginners, you can depend on examining the dataframe to determine number of rows.
+# If you have prior experience, try to write code that will actually provide the number of rows as the output. 
+
+# Look at the help and examples for the dplyr function summarize(). 
+# Use the summarize function to find the mean number (n) for a name
+# for all years in the babynames data.
+babynames %>%
+  filter(name == "Marie") %>%
+  summarise(mean = mean(n))
+# This is a harder question, and may take a lot of trial and error.
+# HINT: you do not need to "group" for this task. 
+
+# Now find the mean n for that name but only after the year 2000.
+babynames %>%
+  filter(name == "Marie" & year > 2000) %>%
+  summarise(mean = mean(n))
+# Again, give it your best shot!
+
+# Create a new dataframe that contains only the names from 2017,
+# and use the arrange() function to sort it with the highest n
+# names at the top.
+names_2017 <- babynames %>%
+  filter(year == 2017) %>%
+  arrange(desc(n))
+
+# Filter the dataframe you just created to the names that 
+# have an n above 10,000 for birth certificates marked "F".
+names_2017 %>%
+  filter(n > 10000 & sex == "F")
+
+# Print/show the names in that dataframe to the console (just the names,
+# not the other columns/data). There are various ways to do this!
+names_2017 %>%
+  select(name)
+
+# Paste below at least 5 of your code answers from the Posit Primer.
+select(babynames, name, year)
+
+filter(babynames, name == "Sea" & sex == "F")
+
+arrange(babynames, n, prop)
+
+babynames %>%
+  filter(name == "Annelise" & sex == "F") %>%
+  summarise(total = sum(n), max = max(n), mean = mean(n))
+
+babynames %>%
+  filter(name == "Khaleesi") %>%
+  summarise(year = first(year))
+
+# class 1/17
+babynames %>%
+  filter(name %in% c("Lisa", "Joseph", "Juan")) %>%
+  group_by(name, sex) %>%
+  summarise(
+    yearmean = mean(n),
+    propmean = mean(prop),
+    yearsum = sum(n)
+  )
+myvec <- c("a", 2, "cat")
+myvec
+littlevec <- 4
+x <- c(2, 4, 6, 8, 10)
+for(i in seq_along(x)) {
+  x[i] <- x[i] / 2
+}
+x
+x <- c(2, 4, 6, 8, 10)
+x/2
+letters
+letters[1]
+letters[100-99]
+letters[1:10]
+# output is letters 1 through 10
+letters == "b"
+letters[letters == "b"]
+
+oddnums <- seq(from = 1, to = 26, by = 2)
+# seq(1, 26, 2) will do the same
+letters[oddnums]
+# to get every other letter
+
+mynums <- c(14, 93, 7, 9330)
+
+mynums[mynums > 20]
+
+mynums > 20
+
+library(tidyverse)
+
+starwars$name
+# $ will extract a column/variable vector from a data set
+
+glimpse(starwars)
+# will give you a glimpse of the data set
+
+starwars[1, 1]
+# will pull out data from row 1 columns 1. ROW FIRST COLUMN SECOND
+
+starwars[, 1]
+# will pull out data from column 1
+
+starwars[1, ]
+# will pull out data from row 1
+
+starwars %>%
+  filter(name == "Luke Skywalker")
+# or
+filter(starwars, name == "Luke Skywalker")
+
+slice(starwars, 1)
+
+select(starwars, 1)
+# pulls data as tibble
+
+pull(starwars, 1)
+# pulls data as vector. similar to $
+
+a <- 1:10
+b <- 5
+c <- a * b
+c
+d <- c(1, 100)
+# c() is combine function, ex puts 1 and 100 in a vector together
+a * d
+e <- c(1, 10, 100)
+# will give warning because it cannot cycle through e 4 complete times (as a only has 10 numbers)
+a * e
+
+my_add2 <- function(firstnumber, secondnumber){
+  firstnumber + secondnumber
+}
+my_add2(34, 68)
+
+data(diamonds)
+
+ggplot(diamonds,
+       mapping = aes(x = carat, y = price)) +
+  geom_point(aes(color = cut)) +
+  geom_smooth()
+
+ggplot(diamonds,
+       mapping = aes(x = carat, y = price)) +
+  geom_point(color = "green") +
+  geom_smooth()
